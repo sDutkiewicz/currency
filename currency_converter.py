@@ -18,23 +18,33 @@ class CurrencyConverter(UI):
         """Prompt the user to enter a new API key."""
         return simpledialog.askstring("API Key", "Enter a new API key:")
 
+    def handle_rate_limit(self, response):
+        """Handle rate limit and prompt for a new API key if needed."""
+        if response.status_code == 429:  # Too many requests
+            messagebox.showerror("Error", "You have exceeded your API rate limit. Please enter a new API key.")
+            self.api_key = self.prompt_for_api_key()
+            if not self.api_key:  # User canceled the input
+                messagebox.showerror("Error", "API key is required to continue.")
+                return False
+            return True
+        return False
+
     def get_currencies(self):
         """Fetch currency symbols and names from the API"""
         while True:
             url = "https://api.apilayer.com/exchangerates_data/symbols"
             headers = {"apikey": self.api_key}
-            response = requests.get(url, headers=headers) # Send a GET request to the API
+            response = requests.get(url, headers=headers)  # Send a GET request to the API
 
-            if response.status_code == 401:  # Unauthorized
-                messagebox.showerror("Error", "Invalid API key. Please enter a new API key.")
-                self.api_key = self.prompt_for_api_key()
-                if not self.api_key:  # User canceled the input
+            if response.status_code in [401, 429]:  # Unauthorized or rate limit exceeded
+                if not self.handle_rate_limit(response):
                     return {}
-            elif response.status_code != 200: # Check if the response status code is not 200 (OK)
+                continue  # Retry with a new API key
+            elif response.status_code != 200:  # Check if the response status code is not 200 (OK)
                 print(f"Error: Unable to fetch data from API. Status code: {response.status_code}")
                 return {}
             else:
-                try: # Try to decode the JSON response
+                try:  # Try to decode the JSON response
                     data = response.json()
                     return data['symbols']
                 except requests.exceptions.JSONDecodeError:
@@ -71,9 +81,9 @@ class CurrencyConverter(UI):
             response = requests.get(url)
             if response.status_code == 200:
                 image_data = response.content
-                flag_image = Image.open(BytesIO(image_data)) # Open the image from the response content
-                flag_image = flag_image.resize((30, 20), Image.LANCZOS) # Resize the image
-                flag_photo = ImageTk.PhotoImage(flag_image) # Create a PhotoImage object from the image
+                flag_image = Image.open(BytesIO(image_data))  # Open the image from the response content
+                flag_image = flag_image.resize((30, 20), Image.LANCZOS)  # Resize the image
+                flag_photo = ImageTk.PhotoImage(flag_image)  # Create a PhotoImage object from the image
                 label.image = flag_photo
                 label.config(image=flag_photo)
             else:
@@ -125,24 +135,27 @@ class CurrencyConverter(UI):
         from_currency = self.from_currency.get().split()[0]
         to_currency = self.to_currency.get().split()[0]
 
-        # Construct the URL for the conversion API
-        url = f"https://api.apilayer.com/exchangerates_data/convert?to={to_currency}&from={from_currency}&amount={amount}"
-        headers = {"apikey": self.api_key}
-        response = requests.get(url, headers=headers)
-        if response.status_code == 401:  # Unauthorized
-            messagebox.showerror("Error", "Invalid API key. Please enter a new API key.")
-            self.api_key = self.prompt_for_api_key()
-            self.convert_currency()  # Retry with new API key
-            return
-        if response.status_code != 200:
-            print(f"Error: Unable to fetch data from API. Status code: {response.status_code}")
-            return
-        try:
-            data = response.json()
-            converted_amount = round(float(data["result"]), 2)
-        except (requests.exceptions.JSONDecodeError, KeyError):
-            print("Error decoding JSON from response")
-            return
+        while True:
+            # Construct the URL for the conversion API
+            url = f"https://api.apilayer.com/exchangerates_data/convert?to={to_currency}&from={from_currency}&amount={amount}"
+            headers = {"apikey": self.api_key}
+            response = requests.get(url, headers=headers)
+
+            if response.status_code in [401, 429]:  # Unauthorized or rate limit exceeded
+                if not self.handle_rate_limit(response):
+                    return  # Exit if the user cancels entering a new API key
+                continue  # Retry with a new API key
+
+            if response.status_code != 200:
+                print(f"Error: Unable to fetch data from API. Status code: {response.status_code}")
+                return
+            try:
+                data = response.json()
+                converted_amount = round(float(data["result"]), 2)
+                break  # Successful request, exit the loop
+            except (requests.exceptions.JSONDecodeError, KeyError):
+                print("Error decoding JSON from response")
+                return
 
         # Display the converted amount in the result entry widget
         self.result.config(state="normal")
