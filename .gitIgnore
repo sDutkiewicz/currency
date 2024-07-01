@@ -1,0 +1,16 @@
+# Ignore the __pycache__ directory
+__pycache__/
+
+# Ignore the build directory created by PyInstaller
+build/
+
+# Ignore the dist directory created by PyInstaller
+dist/
+
+# Ignore spec files created by PyInstaller
+*.spec
+
+# Ignore other temporary files
+*.pyc
+*.pyo
+*.log
