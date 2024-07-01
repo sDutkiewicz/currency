@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
+import os
 
 class UI:
     def __init__(self, master):
@@ -8,9 +9,6 @@ class UI:
         self.master.title("Currency Converter")
         self.master.geometry("600x450")
         self.master.resizable(False, False)
-
-        # Set icon
-        self.master.iconbitmap("small_ico.ico")
 
         # Apply modern theme
         self.style = ttk.Style()
@@ -28,11 +26,21 @@ class UI:
         master.config(menu=self.menubar)
 
         # Create background
-        self.background_image = Image.open("gallery/background.jpg")
-        self.background_photo = ImageTk.PhotoImage(self.background_image)
-        
-        self.background_label = tk.Label(master, image=self.background_photo)
-        self.background_label.place(relwidth=1, relheight=1)
+        background_path = os.path.join(os.path.dirname(__file__), "gallery", "background.jpg")
+        if os.path.exists(background_path):
+            self.background_image = Image.open(background_path)
+            self.background_photo = ImageTk.PhotoImage(self.background_image)
+            self.background_label = tk.Label(master, image=self.background_photo)
+            self.background_label.place(relwidth=1, relheight=1)
+        else:
+            print(f"Background image file not found: {background_path}")
+
+        # Icon
+        icon_path = os.path.join("gallery", "small_ico.ico")
+        if os.path.exists(icon_path):
+            self.master.iconbitmap(icon_path)
+        else:
+            print(f"Icon file not found: {icon_path}")
 
     def setup_widgets(self):
         # Container frame for widgets
