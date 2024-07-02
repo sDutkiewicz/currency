@@ -19,8 +19,8 @@ Currency Converter is a user-friendly desktop application that allows users to c
 ```
 CurrencyConverter/
 │
-├── gallery                     # Directory with pictures used
-├── dist                        # Directory where exe file is stored
+├── gallery/                    # Directory with pictures used
+├── dist/                       # Directory where exe file is stored
 ├── main.py                     # Entry point for the application
 ├── currency_converter.py       # Contains the CurrencyConverter class and logic
 ├── ui.py                       # UI-related logic and setup
