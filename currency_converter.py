@@ -14,9 +14,14 @@ class CurrencyConverter(UI):
         self.currencies = self.get_currencies()
         self.setup_widgets()
 
+
+
     def prompt_for_api_key(self):
         """Prompt the user to enter a new API key."""
         return simpledialog.askstring("API Key", "Enter a new API key:")
+    
+
+
 
     def handle_rate_limit(self, response):
         """Handle rate limit and prompt for a new API key if needed."""
@@ -28,6 +33,9 @@ class CurrencyConverter(UI):
                 return False
             return True
         return False
+
+
+
 
     def get_currencies(self):
         """Fetch currency symbols and names from the API"""
@@ -51,12 +59,18 @@ class CurrencyConverter(UI):
                     print("Error decoding JSON from response")
                     return {}
 
+
+
+
     def create_currency_combobox(self, master):
         """Create widget with currency symbols and names as values"""
         combobox = ttk.Combobox(master, state="readonly")
         currency_list = [f"{code} - {name}" for code, name in self.currencies.items()]
         combobox['values'] = currency_list
         return combobox
+
+
+
 
     def update_flag(self, currency, label):
         """Update the flag image for a currency using the flagsapi.com API"""
@@ -75,6 +89,9 @@ class CurrencyConverter(UI):
             print(f"Error fetching flag image for {currency}: {e}")
             self.set_default_flag(label)
 
+
+
+
     def set_flag_image(self, url, label):
         """Set the flag image for a currency using the image URL"""
         try:
@@ -92,6 +109,9 @@ class CurrencyConverter(UI):
         except Exception as e:
             print(f"Error setting flag image from {url}: {e}")
             self.set_default_flag(label)
+
+
+
 
     def set_default_flag(self, label):
         """Set a default no-flag image for specific currencies without flags"""
@@ -112,6 +132,9 @@ class CurrencyConverter(UI):
             print(f"Error setting default flag image: {e}")
             label.config(image='')
 
+
+
+
     def switch_currencies(self):
         """Switch the 'from' and 'to' currencies and update the flag images accordingly."""
         from_currency = self.from_currency.get()
@@ -120,6 +143,9 @@ class CurrencyConverter(UI):
         self.to_currency.set(from_currency)
         self.update_flag(to_currency.split()[0], self.from_currency_flag)
         self.update_flag(from_currency.split()[0], self.to_currency_flag)
+
+
+
 
     def convert_currency(self):
         """Convert the amount from the 'from' currency to the 'to' currency and display the result."""

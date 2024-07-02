@@ -47,14 +47,19 @@ class UI:
         self.frame = ttk.Frame(self.master, style="Card.TFrame", padding=(20, 20, 20, 20))
         self.frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
+
+        # Title
         self.welcome_label = ttk.Label(self.frame, text="Welcome to Currency Converter", font=("Helvetica", 16, "bold"))
         self.welcome_label.grid(column=0, row=0, columnspan=2, pady=10)
 
+        # Currency converter widgets
         self.amount_label = ttk.Label(self.frame, text="Amount:")
         self.amount_label.grid(column=0, row=1, padx=10, pady=5, sticky=tk.E)
         self.amount = ttk.Entry(self.frame)
         self.amount.grid(column=1, row=1, padx=10, pady=5, sticky=tk.W)
 
+
+        # Currency combobox
         self.from_currency_label = ttk.Label(self.frame, text="From Currency:")
         self.from_currency_label.grid(column=0, row=2, padx=10, pady=5, sticky=tk.E)
         self.from_currency_frame = ttk.Frame(self.frame)
@@ -64,10 +69,14 @@ class UI:
         self.from_currency.set("USD - United States Dollar")
         self.from_currency.bind("<<ComboboxSelected>>", lambda event: self.update_flag(self.from_currency.get().split()[0], self.from_currency_flag))
 
+
+        # Currency flag
         self.from_currency_flag = ttk.Label(self.from_currency_frame)
         self.from_currency_flag.pack(side=tk.LEFT)
         self.update_flag("USD", self.from_currency_flag)
 
+
+        # Currency combobox
         self.to_currency_label = ttk.Label(self.frame, text="To Currency:")
         self.to_currency_label.grid(column=0, row=3, padx=10, pady=5, sticky=tk.E)
         self.to_currency_frame = ttk.Frame(self.frame)
@@ -77,18 +86,26 @@ class UI:
         self.to_currency.set("EUR - Euro")
         self.to_currency.bind("<<ComboboxSelected>>", lambda event: self.update_flag(self.to_currency.get().split()[0], self.to_currency_flag))
 
+
+        # Currency flag
         self.to_currency_flag = ttk.Label(self.to_currency_frame)
         self.to_currency_flag.pack(side=tk.LEFT)
         self.update_flag("EUR", self.to_currency_flag)
 
+
+        # Switch button
         self.switch_button = ttk.Button(self.frame, text="Switch", command=self.switch_currencies)
         self.switch_button.grid(column=1, row=4, pady=5)
 
+
+        # Result
         self.result_label = ttk.Label(self.frame, text="Converted Amount:")
         self.result_label.grid(column=0, row=5, padx=10, pady=5, sticky=tk.E)
         self.result = ttk.Entry(self.frame, state="readonly")
         self.result.grid(column=1, row=5, padx=10, pady=5, sticky=tk.W)
 
+
+        # Convert button
         self.convert_button = ttk.Button(self.frame, text="Convert", command=self.convert_currency)
         self.convert_button.grid(column=1, row=6, pady=10)
 
